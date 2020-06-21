@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "bitcoind.fullname" . }}
+  labels:
+    app: {{ template "bitcoind.name" . }}
+    chart: {{ template "bitcoind.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ template "bitcoind.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "bitcoind.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- if .Values.configurationFile }}
+      initContainers:
+        - name: bitcoind-config
+          image: busybox
+          command: ['sh', '-c', 'for file in $(ls -A /tmpl/ | grep tmpl); do newfile=${file%".tmpl"}; envsubst < /tmpl/$file > {{ .Values.service.mountPath }}/.bitcoin/$newfile; done']
+          volumeMounts:
+            - name: tmpldir
+              mountPath: /tmpl
+            - name: config
+              mountPath: {{ .Values.service.mountPath }}/.bitcoin/
+          envFrom:
+            - secretRef:
+                name: {{ .Values.secretName }}
+      {{- end }}
+      containers:
+        - name: {{ template "bitcoind.fullname" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+          ports:
+            - name: rpc
+              containerPort: {{ .Values.service.rpcPort }}
+            - name: p2p
+              containerPort: {{ .Values.service.p2pPort }}
+            - name: testnet
+              containerPort: {{ .Values.service.testnetPort }}
+            - name: testnetp2pport
+              containerPort: {{ .Values.service.testnetP2pPort }}
+          volumeMounts:
+            - name: data
+              mountPath: {{ .Values.service.mountPath }}
+            - name: config
+              mountPath: {{ .Values.service.mountPath }}/.bitcoin/bitcoin.conf
+              subPath: bitcoin.conf
+            - name: wallet
+              mountPath: {{ .Values.service.walletPath }}
+      volumes:
+        - name: config
+          emptyDir: {}
+        - name: tmpldir
+          configMap:
+            name: {{ .Release.Name }}-configmap
+        - name: data
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "bitcoind.fullname" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{- end -}}

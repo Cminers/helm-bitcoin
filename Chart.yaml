@@ -1,0 +1,19 @@
+apiVersion: v1
+name: bitcoin
+version: 1.0.0
+appVersion: 0.20.0
+description: Bitcoin is an innovative payment network and a new kind of money.
+keywords:
+  - bitcoin
+  - bitcoind
+  - cryptocurrency
+  - blockchain
+home: https://cminers.com
+icon: https://avatars1.githubusercontent.com/u/31481514?s=200&v=4
+sources:
+  - https://github.com/kubernetes/charts
+  - https://github.com/Cminers/docker-bitcoin
+maintainers:
+  - name: C miners
+    email: dev@cminers.com
+engine: gotpl

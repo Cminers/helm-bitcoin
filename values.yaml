@@ -1,0 +1,46 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+terminationGracePeriodSeconds: 30
+image:
+  repository: https://github.com/Cminers/docker-bitcoin.git
+  tag: 0.20.0
+  pullPolicy: IfNotPresent
+
+service:
+  mountPath: "/bitcoin"
+  rpcPort: 8332
+  p2pPort: 8333
+  testnetPort: 18332
+  testnetP2pPort: 18333
+  prune: 47683
+  walletPath: "/bitcoin/.wallet"
+
+secretName: bitcoind-access
+
+secrets:
+  rpcuser: user
+  rpcpassword: password
+
+persistence:
+  enabled: true
+  ## database data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  # storageClass: "-"
+  accessMode: ReadWriteOnce
+  size: 60Gi
+
+## Configure resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources:
+  requests:
+    memory: "2Mi"
+    cpu: "100m"
+  limits:
+    memory: "4Mi"
+    cpu: "200m"
