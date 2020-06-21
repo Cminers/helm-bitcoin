@@ -51,12 +51,12 @@ Parameter | Description | Default
 `service.p2pPort` | P2P port | `8333`
 `service.testnetPort` | Testnet port | `18332`
 `service.testnetP2pPort` | Testnet p2p ports | `18333`
-`service.prune` | Prune the Blockchain [MiB; 49GB] | `46730`
+`service.prune` | Prune the Blockchain [MiB; 50GB] | `47683`
 `service.walletPath` | Wallet location | `/bitcoin/.wallet`
 `service.selector` | Node selector | `tx-broadcast-svc`
 `persistence.enabled` | Create a volume to store data | `true`
 `persistence.accessMode` | ReadWriteOnce or ReadOnly | `ReadWriteOnce`
-`persistence.size` | Size of persistent volume claim | `50Gi`
+`persistence.size` | Size of persistent volume claim | `60Gi`
 `resources` | CPU/Memory resource requests/limits | `{ requests: {memory: "2Mi", cpu: "100m"}, limits: {memory: "4Mi", cpu: "200m"} }`
 `terminationGracePeriodSeconds` | Wait time before forcefully terminating container | `30`
 
